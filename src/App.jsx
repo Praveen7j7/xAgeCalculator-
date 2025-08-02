@@ -1,106 +1,103 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from 'react';
+// import './App.css';
 
 export default function App() {
-  const [years, setYears] = useState(0);
-  const [months, setMonths] = useState(0);
-  const [days, setDays] = useState(0);
-  const [isValid, setIsValid] = useState(null);
-  const [ageResult, setAgeResult] = useState("");
+  const [day, setDay] = useState('');
+  const [month, setMonth] = useState('');
+  const [year, setYear] = useState('');
 
-  function calculateAge(birthDate) {
+  const [errors, setErrors] = useState({});
+  const [age, setAge] = useState({ years: '--', months: '--', days: '--' });
+
+  const validate = () => {
+    const errs = {};
+    if (!day) errs.day = 'This field is required';
+    if (!month) errs.month = 'This field is required';
+    if (!year) errs.year = 'This field is required';
+
+    const dayNum = parseInt(day, 10);
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+
+    if (month && (monthNum < 1 || monthNum > 12)) errs.month = 'Must be a valid month';
+    if (day && (dayNum < 1 || dayNum > 31)) errs.day = 'Must be a valid day';
+
+    const inputDate = new Date(`${year}-${month}-${day}`);
     const today = new Date();
-    let ageYears = today.getFullYear() - birthDate.getFullYear();
-    let ageMonths = today.getMonth() - birthDate.getMonth();
-    let ageDays = today.getDate() - birthDate.getDate();
 
-    if (ageDays < 0) {
-      ageMonths -= 1;
-      const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-      ageDays += prevMonth.getDate();
+    if (inputDate > today) errs.date = 'Must be in past';
+    if (isNaN(inputDate.getTime()) || inputDate.getDate() !== dayNum) errs.date = 'Must be a valid date';
+
+    return errs;
+  };
+
+  const handleCalculate = () => {
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setAge({ years: '--', months: '--', days: '--' });
+      return;
     }
 
-    if (ageMonths < 0) {
-      ageYears -= 1;
-      ageMonths += 12;
+    const birthDate = new Date(`${year}-${month}-${day}`);
+    const today = new Date();
+
+    let y = today.getFullYear() - birthDate.getFullYear();
+    let m = today.getMonth() - birthDate.getMonth();
+    let d = today.getDate() - birthDate.getDate();
+
+    if (d < 0) {
+      m--;
+      d += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+    }
+    if (m < 0) {
+      y--;
+      m += 12;
     }
 
-    return `${ageYears} years, ${ageMonths} months, ${ageDays} days`;
-  }
-
-  useEffect(() => {
-    if (years && months && days) {
-      const birthDate = new Date(years, months - 1, days); // month - 1 because JS months are 0-indexed
-      if (!isNaN(birthDate.getTime()) && birthDate <= new Date()) {
-        setIsValid(true);
-        setAgeResult(calculateAge(birthDate));
-      } else {
-        setIsValid(false);
-        setAgeResult("");
-      }
-    }
-  }, [years, months, days]);
+    setAge({ years: y, months: m, days: d });
+  };
 
   return (
-    <>
-      <h1 className="text-xl font-bold m-4">Age Calculator</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-200">
+      <div className="content bg-white p-6 rounded-2xl w-[300px] lg:w-[750px] shadow-md">
+        <div className="input flex gap-4 mb-4 text-sm font-bold tracking-widest">
+          <div className="flex flex-col">
+            <label htmlFor="dayIn" className="text-red-400">DAY</label>
+            <input id="dayIn" type="number" placeholder="DD" value={day} onChange={(e) => setDay(e.target.value)} className="border p-2 w-20 rounded-md" />
+            {errors.day && <span className="error text-red-500 text-xs">{errors.day}</span>}
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="monthIn" className="text-red-400">MONTH</label>
+            <input id="monthIn" type="number" placeholder="MM" value={month} onChange={(e) => setMonth(e.target.value)} className="border p-2 w-20 rounded-md" />
+            {errors.month && <span className="error text-red-500 text-xs">{errors.month}</span>}
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="yearIn" className="text-red-400">YEAR</label>
+            <input id="yearIn" type="number" placeholder="YYYY" value={year} onChange={(e) => setYear(e.target.value)} className="border p-2 w-28 rounded-md" />
+            {errors.year && <span className="error text-red-500 text-xs">{errors.year}</span>}
+          </div>
+        </div>
 
-      {/* <div className="flex-row gap-4 w-4/5 p-6 border-2 sm:flex-col flex-wrap rounded-2xl "> */}
-      <div className="flex flex-col sm:flex-col lg:flex-row flex-wrap gap-4 w-4/5 p-6 border-2 rounded-2xl">
+        {errors.date && <p className="error text-red-500 text-xs mb-2">{errors.date}</p>}
 
-        <input
-          type="number"
-          className="border-2 m-2 rounded p-1"
-          placeholder="Year"
-          min="1900"
-          max={new Date().getFullYear()}
-          onChange={(e) => {
-            const value = Number(e.target.value);
-            if (value >= 1900 && value <= new Date().getFullYear()) {
-              setYears(value);
-            }
-          }}
-          required
-        />
+        <div className="flex justify-end">
+          <button
+            id="calculateBtn"
+            onClick={handleCalculate}
+            className="bg-purple-600 text-white p-4 rounded-full hover:bg-purple-700 focus:outline-none focus:ring-2"
+          >
+            ↓
+          </button>
+        </div>
 
-        <input
-          type="number"
-          className="border-2 m-2 rounded p-1"
-          placeholder="Month"
-          min="1"
-          max="12"
-          onChange={(e) => {
-            const value = Number(e.target.value);
-            if (value >= 1 && value <= 12) {
-              setMonths(value);
-            }
-          }}
-          required
-        />
-
-        <input
-          type="number"
-          className="border-2 m-2 rounded p-1"
-          placeholder="Day"
-          min="1"
-          max="31"
-          onChange={(e) => {
-            const value = Number(e.target.value);
-            if (value >= 1 && value <= 31) {
-              setDays(value);
-            }
-          }}
-          required
-        />
+        <div className="results mt-6 text-4xl font-black italic">
+          <p><span id="yearOut" className="text-purple-600">{age.years}</span> years</p>
+          <p><span id="monthOut" className="text-purple-600">{age.months}</span> months</p>
+          <p><span id="dayOut" className="text-purple-600">{age.days}</span> days</p>
+        </div>
       </div>
-
-      <div className="m-4">
-        {isValid === true && (
-          <h1 className="text-green-600 font-semibold">Your Age: {ageResult}</h1>
-        )}
-        {isValid === false && (
-          <h1 className="text-red-600 font-semibold">Invalid Date!</h1>
-        )}
-      </div>
-    </>
+    </div>
   );
 }
