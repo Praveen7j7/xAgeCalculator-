@@ -1,0 +1,116 @@
+/* Reset basic styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f3f4f6; /* gray-100 */
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.content {
+  background-color: white;
+  padding: 32px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Inputs */
+.input-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.input-field {
+  flex: 1;
+}
+
+.input-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #ef4444;
+  margin-bottom: 4px;
+}
+
+.input-field input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+}
+
+.input-field input:focus {
+  border-color: #9333ea;
+}
+
+/* Error messages */
+.error {
+  color: #ef4444;
+  font-size: 11px;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.date-error {
+  color: #ef4444;
+  font-size: 12px;
+  margin: 12px 0;
+}
+
+/* Button */
+.calculate-btn {
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px 0;
+}
+
+.calculate-btn button {
+  background-color: #9333ea;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 16px 20px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.calculate-btn button:hover {
+  background-color: #7e22ce;
+}
+
+/* Results */
+.results {
+  font-size: 28px;
+  font-weight: 800;
+  font-style: italic;
+  color: #111827;
+  line-height: 1.6;
+}
+
+.results p {
+  margin: 4px 0;
+}
+
+.results span {
+  color: #9333ea;
+  margin-right: 8px;
+}

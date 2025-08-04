@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// import './App.css';
+import './App.css';
 
 export default function App() {
   const [day, setDay] = useState('');
@@ -11,24 +11,46 @@ export default function App() {
 
   const validate = () => {
     const errs = {};
-    if (!day) errs.day = 'This field is required';
-    if (!month) errs.month = 'This field is required';
-    if (!year) errs.year = 'This field is required';
-
     const dayNum = parseInt(day, 10);
     const monthNum = parseInt(month, 10);
     const yearNum = parseInt(year, 10);
 
-    if (month && (monthNum < 1 || monthNum > 12)) errs.month = 'Must be a valid month';
-    if (day && (dayNum < 1 || dayNum > 31)) errs.day = 'Must be a valid day';
+    if (!day) {
+      errs.day = "This field is required";
+    } else if (dayNum < 1 || dayNum > 31) {
+      errs.day = "Must be a valid day";
+    }
+
+    if (!month) {
+      errs.month = "This field is required";
+    } else if (monthNum < 1 || monthNum > 12) {
+      errs.month = "Must be a valid month";
+    }
 
     const inputDate = new Date(`${year}-${month}-${day}`);
-    const today = new Date();
+      const today = new Date();
+    if (!year) {
+      errs.year = "This field is required";
+    }
+    else if(inputDate>today)
+    {
+      errs.year="Must be in past";
+    }
+    
 
-    if (inputDate > today) errs.date = 'Must be in past';
-    if (isNaN(inputDate.getTime()) || inputDate.getDate() !== dayNum) errs.date = 'Must be a valid date';
+    if (day && month && year) {
+      const inputDate = new Date(`${year}-${month}-${day}`);
+      const today = new Date();
+
+      if (isNaN(inputDate.getTime()) || inputDate.getDate() !== dayNum) {
+        errs.day = "Must be a valid date"; // Only override day field
+      } else if (inputDate > today) {
+        errs.year = "Must be in past"; // You can also assign to `errs.date` if you prefer
+      }
+    }
 
     return errs;
+
   };
 
   const handleCalculate = () => {
@@ -60,44 +82,41 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-200">
-      <div className="content bg-white p-6 rounded-2xl w-[300px] lg:w-[750px] shadow-md">
-        <div className="input flex gap-4 mb-4 text-sm font-bold tracking-widest">
-          <div className="flex flex-col">
-            <label htmlFor="dayIn" className="text-red-400">DAY</label>
-            <input id="dayIn" type="number" placeholder="DD" value={day} onChange={(e) => setDay(e.target.value)} className="border p-2 w-20 rounded-md" />
-            {errors.day && <span className="error text-red-500 text-xs">{errors.day}</span>}
+    <>
+      <div className="container">
+        <div className="content">
+          <div className="input-group">
+            <div className="input-field">
+              <label htmlFor="dayIn">DAY</label>
+              <input id="dayIn" type="number" placeholder="DD" value={day} onChange={(e) => setDay(e.target.value)} />
+              {errors.day && <span className="error">{errors.day}</span>}
+            </div>
+            <div className="input-field">
+              <label htmlFor="monthIn">MONTH</label>
+              <input id="monthIn" type="number" placeholder="MM" value={month} onChange={(e) => setMonth(e.target.value)} />
+              {errors.month && <span className="error">{errors.month}</span>}
+            </div>
+            <div className="input-field">
+              <label htmlFor="yearIn">YEAR</label>
+              <input id="yearIn" type="number" placeholder="YYYY" value={year} onChange={(e) => setYear(e.target.value)} />
+              {errors.year && <span className="error">{errors.year}</span>}
+            </div>
           </div>
-          <div className="flex flex-col">
-            <label htmlFor="monthIn" className="text-red-400">MONTH</label>
-            <input id="monthIn" type="number" placeholder="MM" value={month} onChange={(e) => setMonth(e.target.value)} className="border p-2 w-20 rounded-md" />
-            {errors.month && <span className="error text-red-500 text-xs">{errors.month}</span>}
+
+          {errors.date && <p className="date-error">{errors.date}</p>}
+
+          <div className="calculate-btn">
+            <button id="calculateBtn" onClick={handleCalculate}>↓</button>
           </div>
-          <div className="flex flex-col">
-            <label htmlFor="yearIn" className="text-red-400">YEAR</label>
-            <input id="yearIn" type="number" placeholder="YYYY" value={year} onChange={(e) => setYear(e.target.value)} className="border p-2 w-28 rounded-md" />
-            {errors.year && <span className="error text-red-500 text-xs">{errors.year}</span>}
+
+          <div className="results">
+            <p><span id="yearOut">{age.years}</span>years</p>
+            <p><span id="monthOut">{age.months}</span>months</p>
+            <p><span id="dayOut">{age.days}</span>days</p>
           </div>
-        </div>
-
-        {errors.date && <p className="error text-red-500 text-xs mb-2">{errors.date}</p>}
-
-        <div className="flex justify-end">
-          <button
-            id="calculateBtn"
-            onClick={handleCalculate}
-            className="bg-purple-600 text-white p-4 rounded-full hover:bg-purple-700 focus:outline-none focus:ring-2"
-          >
-            ↓
-          </button>
-        </div>
-
-        <div className="results mt-6 text-4xl font-black italic">
-          <p><span id="yearOut" className="text-purple-600">{age.years}</span> years</p>
-          <p><span id="monthOut" className="text-purple-600">{age.months}</span> months</p>
-          <p><span id="dayOut" className="text-purple-600">{age.days}</span> days</p>
         </div>
       </div>
-    </div>
+
+    </>
   );
 }
